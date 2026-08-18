@@ -1,0 +1,8 @@
+date,description,amount,type,category
+2026-08-01,Salary,25000,income,Salary
+2026-08-02,Hostel,6000,expense,Housing
+2026-08-03,Swiggy,500,expense,Food
+2026-08-04,Uber,300,expense,Transport
+2026-08-05,Amazon,1200,expense,Shopping
+2026-08-06,College Fee,3000,expense,Education
+2026-08-07,Scholarship,3000,income,Scholarship
