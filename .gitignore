@@ -1,0 +1,20 @@
+# --- Python / backend ---
+__pycache__/
+*.pyc
+venv/
+env/
+.venv/
+*.db
+backend/.env
+
+# --- Node (if any) ---
+node_modules/
+
+# --- OS / editor ---
+.DS_Store
+.vscode/
+*.log
+
+# --- Cache (from this dev environment, ignore if present) ---
+.cache/
+.wget-hsts
