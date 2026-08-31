@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WiseGuardian — Financial Health & Credit Readiness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- AUTH SCREEN (shown when no valid session) -->
+  <section id="authScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand" style="justify-content:center">
+        <div class="brand-icon">✓</div>
+        <div>
+          <div class="brand-name">WiseGuardian</div>
+          <small>Consent-Based Health & Credit Readiness</small>
+        </div>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-auth-tab="login">Log In</button>
+        <button type="button" class="auth-tab" data-auth-tab="register">Create Account</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+        <button class="primary auth-submit" type="submit">Log In</button>
+        <p class="auth-error hidden" id="loginError"></p>
+      </form>
+
+      <form id="registerForm" class="auth-form hidden">
+        <label>Full Name<input id="registerName" required placeholder="Your name"></label>
+        <label>Email<input id="registerEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="registerPassword" type="password" required minlength="8" placeholder="At least 8 characters"></label>
+        <label>I am a...
+          <select id="registerType">
+            <option value="student">Student</option>
+            <option value="micro_entrepreneur">Micro-Entrepreneur</option>
+          </select>
+        </label>
+        <button class="primary auth-submit" type="submit">Create Account</button>
+        <p class="auth-error hidden" id="registerError"></p>
+      </form>
+
+      <p class="auth-hint">New here and just want to explore? Register, then use <b>"Load Demo Data"</b> from the home screen — no real financial info required.</p>
+    </div>
+  </section>
+
+  <div id="appShell" class="hidden">
+    <div class="top-banner">
+      <span><b>Privacy First</b> Zero unauthorized data sharing. You control every data point analyzed.</span>
+      <button data-view="consent">Manage Consent Preferences →</button>
+    </div>
+
+    <header class="header">
+      <div class="brand" data-view="home">
+        <div class="brand-icon">✓</div>
+        <div>
+          <div class="brand-name">WiseGuardian <span>ACTIVE</span></div>
+          <small>Consent-Based Health & Credit Readiness</small>
+        </div>
+      </div>
+
+      <nav class="desktop-nav">
+        <button data-view="home">Home</button>
+        <button class="active" data-view="dashboard">Financial Health</button>
+        <button data-view="consent">Consent Manager</button>
+        <button data-view="data">Data & Transactions</button>
+        <button data-view="assistant">AI Advisor</button>
+        <button data-view="profile">My Profile</button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="quick-add" data-view="data">＋ Add Record</button>
+        <span class="consent-pill">● <span id="consentCount">0/5 Consents Granted</span></span>
+        <div class="avatar" id="userAvatar" data-view="profile" title="View Profile" style="cursor:pointer">--</div>
+        <button class="logout-btn" id="logoutBtn" title="Log out">⏻</button>
+      </div>
+    </header>
+
+    <div class="mobile-nav">
+      <button data-view="home">Home</button>
+      <button data-view="dashboard" class="active">Health</button>
+      <button data-view="consent">Consent</button>
+      <button data-view="data">Data</button>
+      <button data-view="assistant">Advisor</button>
+      <button data-view="profile">Profile</button>
+    </div>
+
+    <main>
+    <!-- HOME -->
+    <section id="home" class="view hidden">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">🛡 Consent-Driven AI Platform</span>
+          <h1>Build Credit Readiness with <em>100% Privacy & Clarity</em>.</h1>
+          <p>WiseGuardian turns everyday cash flow, student stipends and small-business earnings into an explainable financial health and Credit Readiness profile.</p>
+          <div class="hero-actions">
+            <button class="primary" data-view="dashboard">Open Financial Dashboard →</button>
+            <button class="secondary" data-view="consent">Review Privacy & Consent</button>
+            <button class="secondary" id="seedDemoBtn">Load Demo Data</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="audience-grid">
+        <article class="info-card">
+          <div class="big-icon">🎓</div>
+          <h2>For Students & Young Adults</h2>
+          <p>Track allowances, campus expenses, savings and financial habits without requiring a traditional credit history.</p>
+          <ul><li>Track monthly income and spending</li><li>Build a savings history</li><li>Get AI-guided financial insights</li></ul>
+          <button data-view="dashboard">Explore Student Mode</button>
+        </article>
+        <article class="info-card">
+          <div class="big-icon">💼</div>
+          <h2>For Micro-Entrepreneurs</h2>
+          <p>Understand irregular cash flow, operating expenses and liquidity before taking on additional repayment obligations.</p>
+          <ul><li>Track inflow vs operating expenses</li><li>Model liquidity buffers</li><li>Maintain a consent audit trail</li></ul>
+          <button data-view="dashboard">Explore Entrepreneur Mode</button>
+        </article>
+      </div>
+
+      <div class="principles">
+        <h2>Why Consent-First Financial Health?</h2>
+        <div class="principle-grid">
+          <div><b>🔒 Zero Black Box</b><p>Every score factor has a visible explanation.</p></div>
+          <div><b>🎛 Granular Control</b><p>Toggle individual categories of financial data.</p></div>
+          <div><b>💡 Empowerment Over Debt</b><p>Focus on savings and liquidity before borrowing.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="view">
+      <div class="section-head">
+        <div>
+          <h1>Financial Health & Readiness</h1>
+          <p>Calculations shown here are based on authorized data inputs.</p>
+        </div>
+        <div class="subtabs">
+          <button class="active" data-subtab="all">Health Overview</button>
+          <button data-subtab="savings">Savings & Liquidity</button>
+          <button data-subtab="borrowing">Borrowing & Credit</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat" data-subtab-group="all savings"><span>Total Monthly Income</span><strong id="incomeValue">₹25,000</strong><small>Salary, stipend & other income</small></div>
+        <div class="stat" data-subtab-group="all savings"><span>Total Monthly Expenses</span><strong id="expenseValue">₹18,500</strong><small>Essential & discretionary</small></div>
+        <div class="stat" data-subtab-group="all savings"><span>Net Monthly Cash Flow</span><strong class="positive" id="cashflowValue">+₹6,500</strong><small>Available for reserves</small></div>
+        <div class="stat" data-subtab-group="all savings borrowing"><span>Savings Rate</span><strong id="savingsValue">26.0%</strong><small>Current estimated rate</small></div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div>
+          <div class="card score-card" id="creditScoreCard" data-subtab-group="all borrowing">
+            <div class="card-head"><div><h2>Credit Readiness Score</h2><p>Explainable indicator — not an official credit score.</p></div><span class="badge good">GOOD</span></div>
+            <div class="score-row">
+              <div class="gauge"><div><strong id="scoreValue">72</strong><small>/ 100</small></div></div>
+              <div class="thresholds">
+                <b>Readiness level</b>
+                <p>🟢 70–100: Strong readiness</p>
+                <p>🟡 50–69: Moderate</p>
+                <p>🔴 0–49: Building phase</p>
+              </div>
+            </div>
+            <div class="factors">
+              <h3>Key Driving Factors</h3>
+              <div class="factor-grid" id="factorGrid">
+                <div class="empty-note">Loading factors…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="cashflowCard" data-subtab-group="all savings">
+            <div class="card-head"><div><h2>Cash Inflow vs Outflow Trend</h2><p>Illustrative six-month overview</p></div></div>
+            <div class="bars" id="cashflowChart"></div>
+            <div class="chart-legend"><span>■ Income</span><span>■ Expenses</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" id="expenseCard" data-subtab-group="all savings">
+            <div class="card-head"><div><h2>Top Spending Categories</h2><p>This month</p></div></div>
+            <div id="expenseCategoryList"><div class="empty-note">Loading…</div></div>
+          </div>
+
+          <div class="card" id="recommendationCard" data-subtab-group="all savings borrowing">
+            <div class="card-head"><h2>Recommendations</h2></div>
+            <div id="recommendationList"><div class="empty-note">Loading…</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONSENT -->
+    <section id="consent" class="view hidden">
+      <div class="card">
+        <div class="section-head simple"><div><h1>Consent & Data Authorization Manager</h1><p>Only explicitly authorized data should be used for analysis.</p></div><button class="danger" id="revokeAll">Revoke All</button></div>
+        <div class="consent-grid" id="consentGrid">
+          <div class="empty-note">Loading consent status…</div>
+        </div>
+        <div class="audit">
+          <h3>Consent Audit Log</h3>
+          <table><thead><tr><th>Time</th><th>Category</th><th>Action</th></tr></thead><tbody id="auditBody"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- DATA -->
+    <section id="data" class="view hidden">
+      <div class="card">
+        <div class="section-head simple"><div><h1>Transaction & Data Management</h1><p>Add records manually or upload a CSV statement.</p></div></div>
+        <div class="form-grid">
+          <label>Type<select id="txType"><option value="expense">Expense</option><option value="income">Income</option></select></label>
+          <label>Source / Merchant<input id="txTitle" placeholder="e.g. Hostel, Salary"></label>
+          <label>Amount (₹)<input id="txAmount" type="number" min="0" placeholder="0"></label>
+          <label>Category<select id="txCategory"><option>Food</option><option>Housing</option><option>Education</option><option>Transport</option><option>Business</option><option>Other</option></select></label>
+          <label>Date<input id="txDate" type="date"></label>
+        </div>
+        <button class="primary" id="addTransaction">Add Transaction</button>
+
+        <div class="csv-upload">
+          <h2>Or Upload a CSV Statement</h2>
+          <p class="csv-hint">Required columns: date, description, amount, type (income/expense). Nothing is stored until you confirm the preview.</p>
+          <div class="csv-row">
+            <input type="file" id="csvFile" accept=".csv">
+            <button class="secondary" id="csvPreviewBtn" type="button">Preview Upload</button>
+            <button class="primary hidden" id="csvConfirmBtn" type="button">Confirm & Store Valid Rows</button>
+          </div>
+          <div id="csvPreviewResult"></div>
+        </div>
+
+        <div class="transactions">
+          <h2>Recent Records</h2>
+          <table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Category</th><th>Amount</th></tr></thead><tbody id="transactionBody"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASSISTANT -->
+    <section id="assistant" class="view hidden">
+      <div class="card assistant-card">
+        <div class="assistant-head"><div class="ai-icon">✦</div><div><h1>AI Financial Advisor</h1><p>Ask questions about the financial data you have consented to share.</p></div></div>
+        <div class="chat" id="chat">
+          <div class="message ai">Hi! I can explain your cash flow, savings capacity and Credit Readiness Score. What would you like to understand?</div>
+        </div>
+        <div class="suggestions">
+          <button data-question="Why is my score 72?">Why is my score 72?</button>
+          <button data-question="Where am I spending the most?">Where am I spending the most?</button>
+          <button data-question="How can I save more?">How can I save more?</button>
+        </div>
+        <form id="chatForm" class="chat-form"><input id="chatInput" placeholder="Ask about your finances..." autocomplete="off"><button>Send</button></form>
+      </div>
+    </section>
+
+    <!-- USER PROFILE VIEW -->
+    <section id="profile" class="view hidden">
+      <div class="card">
+        <div class="section-head simple">
+          <div>
+            <h1>User Profile & Account Settings</h1>
+            <p>View and update your personal details, persona role, and security preferences.</p>
+          </div>
+        </div>
+
+        <div class="profile-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+          <!-- User Summary Card -->
+          <div class="info-card" style="padding: 1.5rem; margin: 0;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem;">
+              <div class="avatar" id="profileCardAvatar" style="width: 52px; height: 52px; font-size: 1.3rem; font-weight: bold; background: #0d4734; color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 50%;">--</div>
+              <div>
+                <h3 id="profileNameDisplay" style="margin: 0; font-size: 1.2rem; color: #1c2e26;">User Name</h3>
+                <p id="profileEmailDisplay" style="margin: 0.2rem 0 0; color: #5a6e65; font-size: 0.85rem;">user@example.com</p>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #e1e8e4; padding-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem;">
+              <div><span style="color: #6c7e75;">User Role / Persona:</span> <b id="profileTypeDisplay" style="text-transform: capitalize; color: #0d4734;">Student</b></div>
+              <div><span style="color: #6c7e75;">Member Account ID:</span> <span id="profileIdDisplay" style="font-family: monospace; font-size: 0.85rem;">#...</span></div>
+              <div><span style="color: #6c7e75;">Auth Status:</span> <span class="badge good">Active Session</span></div>
+            </div>
+          </div>
+
+          <!-- Edit Profile Form -->
+          <div class="info-card" style="padding: 1.5rem; margin: 0;">
+            <h3 style="margin-top: 0; margin-bottom: 1rem;">Edit Profile Info</h3>
+            <form id="profileForm" style="display: flex; flex-direction: column; gap: 1rem;">
+              <label>Full Name
+                <input id="editProfileName" type="text" required placeholder="Enter full name" style="width: 100%; padding: 0.6rem; border: 1px solid #c8cfca; border-radius: 8px; margin-top: 0.3rem;">
+              </label>
+              <label>Persona Type
+                <select id="editProfileType" style="width: 100%; padding: 0.6rem; border: 1px solid #c8cfca; border-radius: 8px; margin-top: 0.3rem;">
+                  <option value="student">Student & Young Adult</option>
+                  <option value="micro_entrepreneur">Micro-Entrepreneur</option>
+                </select>
+              </label>
+              <button type="submit" class="primary" style="margin-top: 0.5rem; width: max-content;">Save Changes</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  </div><!-- /appShell -->
+
+  <div id="toast" class="toast"></div>
+  <script src="js/script.js"></script>
+</body>
+</html>
