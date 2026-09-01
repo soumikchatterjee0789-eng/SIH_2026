@@ -27,9 +27,20 @@ class Settings(BaseSettings):
         "http://localhost:5500,http://127.0.0.1:5500"
     )
 
-    # --- Optional AI/LLM ---
+    # --- AI & LLM Engine Configuration ---
+    # Supports Google Gemini, OpenAI, Groq, Anthropic, Ollama, and Local Deterministic Reasoner
     AI_API_KEY: str | None = None
-    AI_PROVIDER_MODEL: str = "claude-sonnet-4-6"
+    GEMINI_API_KEY: str | None = None
+    OPENAI_API_KEY: str | None = None
+    GROQ_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
+    OLLAMA_BASE_URL: str | None = None  # e.g., "http://localhost:11434"
+
+    AI_PROVIDER: str = "auto"  # "auto", "gemini", "openai", "groq", "ollama", "reasoner"
+    AI_MODEL: str | None = None  # default resolved dynamically based on provider
+    AI_PROVIDER_MODEL: str = "gemini-1.5-flash"
+    AI_TEMPERATURE: float = 0.2
+    AI_TIMEOUT_SECONDS: float = 12.0
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -43,6 +54,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.ENVIRONMENT.lower() == "production"
+
+    @property
+    def active_gemini_key(self) -> str | None:
+        return self.GEMINI_API_KEY or self.AI_API_KEY
 
 
 settings = Settings()

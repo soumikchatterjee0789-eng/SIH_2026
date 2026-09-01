@@ -10,7 +10,7 @@
    - Cookie & LocalStorage token resolution.
    ============================================================ */
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://sih-2026-1-syob.onrender.com";
 
 const CONSENT_CATEGORIES = ["income", "expenses", "transactions", "savings", "borrowing"];
 const CONSENT_LABELS = {
@@ -223,6 +223,9 @@ function showView(id) {
   );
   if (id === "profile") {
     loadProfile();
+  }
+  if (id === "assistant") {
+    loadAssistantSuggestions();
   }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -568,11 +571,13 @@ function setupEventHandlers() {
     askAssistant(q);
   });
 
-  $$(".suggestions button").forEach((b) =>
-    b.addEventListener("click", () => {
-      if (b.dataset.question) askAssistant(b.dataset.question);
-    })
-  );
+  // AI Assistant Chat — use event delegation so dynamic chips work too
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".suggestions button[data-question]");
+    if (chip && chip.dataset.question) {
+      askAssistant(chip.dataset.question);
+    }
+  });
 
   window.addEventListener("storage", (e) => {
     if (e.key === "wg_token") {
@@ -1010,30 +1015,287 @@ function renderRecords(bundle, txns) {
 }
 
 /* ------------------------------------------------------------
-   AI Assistant Helper
+   AI Assistant — Markdown Renderer
+   Pure-JS, zero-dependency renderer that handles the rich Markdown
+   responses produced by the WiseGuardian Deep Financial Reasoner
+   and LLM Gateway (headers, bold, bullets, blockquotes, code, tables).
    ------------------------------------------------------------ */
-function addMessage(text, type) {
+function renderMarkdown(md) {
+  if (!md) return "";
+
+  // We process line-by-line for block elements, then apply inline rules.
+  const lines = md.split("\n");
+  let html = "";
+  let inUl = false;
+  let inTable = false;
+  let tableHeaderDone = false;
+
+  const closeUl = () => {
+    if (inUl) { html += "</ul>"; inUl = false; }
+  };
+  const closeTable = () => {
+    if (inTable) { html += "</tbody></table>"; inTable = false; tableHeaderDone = false; }
+  };
+
+  const inlineFormat = (text) => {
+    // Escape existing HTML entities first, then apply formatting
+    let t = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    // Bold+italic ***text***
+    t = t.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
+    // Bold **text**
+    t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    // Italic *text*
+    t = t.replace(/\*(.+?)\*/g, "<em>$1</em>");
+    // Inline code `text`
+    t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
+    return t;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trimEnd();
+
+    // === Heading 4 ####
+    if (/^####\s+/.test(line)) {
+      closeUl(); closeTable();
+      html += `<h4>${inlineFormat(line.replace(/^####\s+/, ""))}</h4>`;
+      continue;
+    }
+    // === Heading 3 ###
+    if (/^###\s+/.test(line)) {
+      closeUl(); closeTable();
+      html += `<h3>${inlineFormat(line.replace(/^###\s+/, ""))}</h3>`;
+      continue;
+    }
+    // === Heading 2 ##
+    if (/^##\s+/.test(line)) {
+      closeUl(); closeTable();
+      html += `<h2>${inlineFormat(line.replace(/^##\s+/, ""))}</h2>`;
+      continue;
+    }
+    // === Horizontal rule ---
+    if (/^---+$/.test(line.trim())) {
+      closeUl(); closeTable();
+      html += "<hr>";
+      continue;
+    }
+    // === Blockquote >
+    if (/^>\s*/.test(line)) {
+      closeUl(); closeTable();
+      html += `<blockquote>${inlineFormat(line.replace(/^>\s*/, ""))}</blockquote>`;
+      continue;
+    }
+    // === Table row (contains |)
+    if (/^\|/.test(line)) {
+      const cells = line.split("|").slice(1, -1).map(c => c.trim());
+      // Detect separator row |:---|:---|
+      if (cells.every(c => /^:?-+:?$/.test(c))) {
+        tableHeaderDone = true;
+        continue;
+      }
+      if (!inTable) {
+        closeUl();
+        html += `<table><thead><tr>${cells.map(c => `<th>${inlineFormat(c)}</th>`).join("")}</tr></thead><tbody>`;
+        inTable = true;
+        tableHeaderDone = false;
+      } else {
+        html += `<tr>${cells.map(c => `<td>${inlineFormat(c)}</td>`).join("")}</tr>`;
+      }
+      continue;
+    }
+    // If we were in a table and hit a non-table line, close it
+    if (inTable) closeTable();
+
+    // === Bullet list - item or * item
+    if (/^(\s*)[-*]\s+/.test(line)) {
+      if (!inUl) { html += "<ul>"; inUl = true; }
+      const content = line.replace(/^(\s*)[-*]\s+/, "");
+      html += `<li>${inlineFormat(content)}</li>`;
+      continue;
+    }
+    // Numbered list
+    if (/^\d+\.\s+/.test(line)) {
+      closeUl(); closeTable();
+      const content = line.replace(/^\d+\.\s+/, "");
+      // Wrap in ol only if not already — for simplicity emit as li in a new ol each time
+      html += `<ol start="${line.match(/^(\d+)/)[1]}"><li>${inlineFormat(content)}</li></ol>`;
+      continue;
+    }
+
+    // Close open list for non-list lines
+    if (!/^(\s*)[-*]\s+/.test(line)) closeUl();
+
+    // === Empty line → paragraph break
+    if (line.trim() === "") {
+      html += "<br>";
+      continue;
+    }
+
+    // === Default paragraph
+    html += `<p>${inlineFormat(line)}</p>`;
+  }
+
+  // Close any open blocks
+  closeUl();
+  closeTable();
+
+  return html;
+}
+
+/* ------------------------------------------------------------
+   AI Assistant — Core Functions
+   ------------------------------------------------------------ */
+
+/**
+ * Append a message bubble to the chat window.
+ * @param {string}  content  Text (user) or Markdown string (ai)
+ * @param {"user"|"ai"|"typing"} type
+ * @returns {HTMLElement} the created element
+ */
+function addMessage(content, type) {
   const chat = $("#chat");
-  if (!chat) return;
+  if (!chat) return null;
+
   const el = document.createElement("div");
   el.className = `message ${type}`;
-  el.textContent = text;
+
+  if (type === "typing") {
+    // Animated typing dots
+    el.innerHTML = `<span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>`;
+  } else if (type === "ai") {
+    // Render Markdown → HTML
+    el.innerHTML = renderMarkdown(content);
+  } else {
+    // User message — plain text (safe, no XSS)
+    el.textContent = content;
+  }
+
   chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
+}
+
+/**
+ * Render follow-up suggestion chips below an AI message element.
+ */
+function addFollowUpChips(followups, afterEl) {
+  const chat = $("#chat");
+  if (!chat || !followups || followups.length === 0) return;
+
+  const container = document.createElement("div");
+  container.className = "followup-chips";
+  followups.forEach((prompt) => {
+    const btn = document.createElement("button");
+    btn.dataset.question = prompt;
+    btn.textContent = prompt;
+    container.appendChild(btn);
+  });
+
+  // Insert after the AI message element
+  if (afterEl && afterEl.nextSibling) {
+    chat.insertBefore(container, afterEl.nextSibling);
+  } else {
+    chat.appendChild(container);
+  }
   chat.scrollTop = chat.scrollHeight;
 }
 
+/**
+ * Send a question to the AI advisor, show typing indicator, render response.
+ */
 async function askAssistant(question) {
+  // Show user message
   addMessage(question, "user");
+
+  // Disable input while processing
+  const input = $("#chatInput");
+  const sendBtn = $("#chatForm button");
+  if (input) input.disabled = true;
+  if (sendBtn) sendBtn.disabled = true;
+
+  // Show animated typing indicator
+  const typingEl = addMessage("", "typing");
+
   try {
     const res = await apiFetch("/api/assistant/chat", {
       method: "POST",
       body: { message: question },
     });
-    addMessage(res?.answer || "No response received.", "ai");
-  } catch (err) {
-    if (err.code !== "ABORTED" && err.code !== "DEAUTH_IN_PROGRESS") {
-      addMessage(err.message || "Failed to contact AI advisor.", "ai");
+
+    // Remove typing indicator
+    if (typingEl) typingEl.remove();
+
+    const answer = res?.answer || "I encountered an issue generating a response. Please try again.";
+    const followups = res?.suggested_followups || [];
+    const source = res?.source || "";
+
+    // Render the AI response with Markdown
+    const aiEl = addMessage(answer, "ai");
+
+    // Show source badge if it was a live LLM (not local reasoner)
+    if (source && source.startsWith("llm:") && aiEl) {
+      const badge = document.createElement("span");
+      badge.className = "ai-source-badge";
+      badge.textContent = `✦ ${source.replace("llm:", "").split("/")[0].toUpperCase()}`;
+      aiEl.appendChild(badge);
     }
+
+    // Render follow-up chips
+    addFollowUpChips(followups, aiEl);
+
+  } catch (err) {
+    if (typingEl) typingEl.remove();
+    if (err.code !== "ABORTED" && err.code !== "DEAUTH_IN_PROGRESS") {
+      addMessage(
+        err.message && !err.message.includes("FastAPI")
+          ? err.message
+          : "⚠️ Could not reach the AI advisor. Please ensure the backend server is running.",
+        "ai"
+      );
+    }
+  } finally {
+    if (input) input.disabled = false;
+    if (sendBtn) sendBtn.disabled = false;
+    if (input) input.focus();
+  }
+}
+
+/**
+ * Load personalized prompt suggestions from the backend based on user persona.
+ * Falls back to hardcoded chips if the API is unavailable.
+ */
+async function loadAssistantSuggestions() {
+  const suggestionsEl = $(".suggestions");
+  if (!suggestionsEl) return;
+
+  // Static fallback prompts (always shown immediately for responsiveness)
+  const fallbackPrompts = [
+    "Why is my credit readiness score what it is?",
+    "Where am I spending the most?",
+    "How can I save more every month?",
+    "Can I afford a ₹5,000 EMI?",
+    "How do I build an emergency fund?",
+  ];
+
+  const renderChips = (prompts) => {
+    suggestionsEl.innerHTML = prompts
+      .map((p) => `<button data-question="${escapeHtml(p)}">${escapeHtml(p)}</button>`)
+      .join("");
+  };
+
+  // Render fallbacks instantly, then try to fetch personalized ones
+  renderChips(fallbackPrompts);
+
+  try {
+    const data = await apiFetch("/api/assistant/prompts");
+    if (data?.prompts && data.prompts.length > 0) {
+      renderChips(data.prompts);
+    }
+  } catch {
+    // Fallback chips already rendered — silent fail is fine
   }
 }
 
