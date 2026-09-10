@@ -1,8 +1,8 @@
 """
 Shared pytest fixtures.
 
-Uses a fresh SQLite file per test session (not the dev DB) and overrides
-the get_db dependency so tests never touch real data.
+Uses an in-memory SQLite database with StaticPool for lightning-fast,
+zero-file-lock testing on all operating systems (including Windows).
 """
 import os
 import sys
@@ -13,16 +13,21 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
-os.environ["DATABASE_URL"] = "sqlite:///./test_s41.db"
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["SECRET_KEY"] = "test-secret-key"
 
 import app.models  # noqa: E402, F401 (register models before importing `app` the FastAPI instance)
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402  (must be last: rebinds name `app` to the FastAPI instance)
 
-TEST_DB_URL = "sqlite:///./test_s41.db"
-engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
+TEST_DB_URL = "sqlite:///:memory:"
+engine = create_engine(
+    TEST_DB_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -39,13 +44,10 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
-    if os.path.exists("test_s41.db"):
-        os.remove("test_s41.db")
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
-    if os.path.exists("test_s41.db"):
-        os.remove("test_s41.db")
+    engine.dispose()
 
 
 @pytest.fixture()

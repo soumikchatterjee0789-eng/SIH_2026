@@ -8,4 +8,10 @@ class AssistantChatRequest(BaseModel):
 class AssistantChatResponse(BaseModel):
     answer: str
     used_insufficient_data_fallback: bool
-    source: str = "structured_backend_data"
+    source: str = "autonomous_financial_engine"
+    suggested_followups: list[str] = []
+
+
+class AssistantPromptsResponse(BaseModel):
+    user_type: str
+    prompts: list[str]

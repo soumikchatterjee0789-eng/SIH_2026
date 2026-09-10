@@ -116,7 +116,7 @@ class LLMGateway:
         user_message: str,
         chat_history: list[dict[str, str]] | None = None,
     ) -> tuple[str, str] | None:
-        model = settings.AI_MODEL or "gemini-1.5-flash"
+        model = settings.AI_MODEL or settings.AI_PROVIDER_MODEL or "gemini-2.0-flash"
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
         system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
