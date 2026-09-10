@@ -311,5 +311,34 @@
 
   <div id="toast" class="toast"></div>
   <script src="js/script.js"></script>
+  <!-- God Level 3D Tilt Effect -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      VanillaTilt.init(document.querySelectorAll(".info-card, .stat, .card, .principle-grid > div"), {
+        max: 5,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.1,
+      });
+      
+      // Setup dynamic intersection observer for scroll fade-ins
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            entry.target.style.opacity = 1;
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      document.querySelectorAll('section').forEach(section => {
+        section.style.opacity = 0;
+        section.style.transform = 'translateY(20px)';
+        section.style.transition = 'all 0.6s ease-out';
+        observer.observe(section);
+      });
+    });
+  </script>
 </body>
 </html>
