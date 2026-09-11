@@ -67,19 +67,18 @@ def answer_question_detailed(
         for c in reversed(recent_convs)
     ]
 
-    # Attempt LLM Gateway if consented data exists and key is present
-    if context.has_minimum_data:
-        llm_res = _llm_gateway.generate_response(context, message, chat_history)
-        if llm_res:
-            answer_text, provider_model = llm_res
-            return {
-                "answer": answer_text,
-                "used_insufficient_data_fallback": False,
-                "source": f"llm:{provider_model}",
-                "suggested_followups": get_suggested_prompts(context.user_type)[:3],
-            }
+    # Attempt LLM Gateway first (Gemini). It checks internally if an API key is configured.
+    llm_res = _llm_gateway.generate_response(context, message, chat_history)
+    if llm_res:
+        answer_text, provider_model = llm_res
+        return {
+            "answer": answer_text,
+            "used_insufficient_data_fallback": not context.has_minimum_data,
+            "source": f"llm:{provider_model}",
+            "suggested_followups": get_suggested_prompts(context.user_type)[:3],
+        }
 
-    # Autonomous Deep Financial Reasoner (Deterministic God-Level Expert)
+    # Autonomous Deep Financial Reasoner (Deterministic Fallback if NO API KEY is present)
     reasoner_answer, used_fallback, followups = _deep_reasoner.reason(context, message)
 
     return {
