@@ -10,7 +10,9 @@
    - Cookie & LocalStorage token resolution.
    ============================================================ */
 
-const API_BASE_URL = "https://sih-2026-1-syob.onrender.com";
+const API_BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+  ? "http://localhost:8000"
+  : "https://sih-2026-1-syob.onrender.com";
 
 const CONSENT_CATEGORIES = ["income", "expenses", "transactions", "savings", "borrowing"];
 const CONSENT_LABELS = {
