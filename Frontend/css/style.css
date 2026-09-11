@@ -246,3 +246,237 @@ main{max-width:1280px;margin:auto;padding:28px 4% 60px;animation:fadeInUp 0.6s e
 .suggestions button:hover {
   background: #e9f6ef;
 }
+
+/* ============================================================
+   🔥 GOD LEVEL PRO MAX UPGRADES 🔥
+   Fluid Animations, Liquid Backgrounds, Magnetic Effects, Spring Physics
+   ============================================================ */
+
+/* Hide default cursor on desktop */
+@media (pointer: fine) {
+  body { cursor: none; }
+  a, button, input, select { cursor: none; }
+}
+
+/* 1. Custom Glowing Cursor */
+.cursor-dot, .cursor-outline {
+  position: fixed;
+  top: 0; left: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 99999;
+  pointer-events: none;
+}
+.cursor-dot {
+  width: 8px; height: 8px;
+  background: #1ec485;
+  box-shadow: 0 0 15px #1ec485, 0 0 30px #1ec485;
+  transition: width 0.2s, height 0.2s, background 0.2s;
+}
+.cursor-outline {
+  width: 40px; height: 40px;
+  border: 2px solid rgba(30, 196, 133, 0.4);
+  transition: width 0.15s ease-out, height 0.15s ease-out, border-color 0.2s;
+}
+/* When hovering over clickable things */
+.cursor-dot.hover {
+  width: 12px; height: 12px;
+  background: #0d4734;
+  box-shadow: 0 0 20px #0d4734;
+}
+.cursor-outline.hover {
+  width: 60px; height: 60px;
+  border-color: rgba(13, 71, 52, 0.8);
+  background: rgba(13, 71, 52, 0.05);
+  backdrop-filter: blur(2px);
+}
+
+/* 2. Liquid Glowing Orbs Background (Hero Section) */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: #062b1e;
+  z-index: 1;
+}
+.hero::before, .hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  animation: floatFluid 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero::before {
+  width: 40vw; height: 40vw;
+  background: rgba(30, 196, 133, 0.35);
+  top: -10vw; left: -10vw;
+}
+.hero::after {
+  width: 50vw; height: 50vw;
+  background: rgba(13, 71, 52, 0.6);
+  bottom: -20vw; right: -10vw;
+  animation-delay: -5s;
+  animation-direction: alternate-reverse;
+}
+@keyframes floatFluid {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(10vw, 5vw) scale(1.1) rotate(90deg); }
+  100% { transform: translate(-5vw, 15vw) scale(0.9) rotate(180deg); }
+}
+.hero > div { z-index: 2; position: relative; }
+
+/* 3. Magnetic Buttons Base Transition */
+.primary, .secondary, .info-card button, .quick-add {
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, background 0.3s ease !important;
+  will-change: transform;
+}
+
+/* 4. Spring Physics for AI Chat Messages */
+.message {
+  animation: springPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: bottom left;
+  opacity: 0;
+}
+.message.user {
+  transform-origin: bottom right;
+}
+@keyframes springPop {
+  0% { opacity: 0; transform: scale(0.6) translateY(30px); }
+  50% { opacity: 1; transform: scale(1.05) translateY(-5px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 5. Fluid Staggered Entrance for Cards */
+.card, .stat, .info-card, .consent-card {
+  opacity: 0;
+  animation: slideUpFade 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+.card:nth-child(1), .stat:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2), .stat:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3), .stat:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4), .stat:nth-child(4) { animation-delay: 0.4s; }
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 6. AI Glowing Input Focus */
+#chatInput {
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+#chatInput:focus {
+  border-color: #1ec485;
+  box-shadow: 0 0 0 4px rgba(30, 196, 133, 0.15), 0 10px 20px rgba(13, 71, 52, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Remove old conflicting hero animations */
+.hero { animation: none !important; }
+
+/* ============================================================
+   🍏 APPLE LEVEL FLUID UI / UX 🍏
+   Aurora Mesh Gradient, iOS Spring Physics, Perfect Glassmorphism
+   ============================================================ */
+
+/* 1. Apple Aurora Moving Background */
+.apple-aurora {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -2;
+  background: #020604;
+  overflow: hidden;
+}
+.apple-aurora::before, .apple-aurora::after {
+  content: "";
+  position: absolute;
+  width: 60vw; height: 60vw;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: auroraMove 18s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+.apple-aurora::before {
+  background: rgba(26, 143, 97, 0.25);
+  top: -10vw; right: -10vw;
+}
+.apple-aurora::after {
+  background: rgba(13, 71, 52, 0.35);
+  bottom: -10vw; left: -10vw;
+  animation-delay: -9s;
+}
+@keyframes auroraMove {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10vw, 10vw) scale(1.1); }
+  100% { transform: translate(5vw, -15vw) scale(0.9); }
+}
+
+/* 2. Fix & Elevate Auth Screen (Login) */
+.auth-screen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  padding: 20px;
+}
+.auth-screen.hidden {
+  display: none !important;
+}
+
+/* 3. Apple Style Glass Card for Login */
+.auth-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 32px !important;
+  padding: 40px !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  animation: applePopIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes applePopIn {
+  0% { opacity: 0; transform: scale(0.9) translateY(40px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* 4. Inputs & Buttons (iOS Style) */
+.auth-form input, .auth-form select {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+  font-size: 15px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+.auth-form input:focus {
+  border-color: #1ec485 !important;
+  box-shadow: 0 0 0 4px rgba(30, 196, 133, 0.15) !important;
+  transform: translateY(-1px);
+}
+.auth-submit {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  color: white !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25) !important;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s !important;
+}
+.auth-submit:active {
+  transform: scale(0.96) !important;
+}
+
+/* 5. Fluid Stagger for everything else */
+.card, .stat, .info-card {
+  animation: applePopIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
